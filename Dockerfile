@@ -25,6 +25,8 @@ COPY docker-compose.yml $HOME/docker-compose.yml
 # https://github.com/gormanb/mongo-shardalyzer
 # There are lots of outdate packages in this build
 # Has a dependency on git Alpine package
+COPY mongo-shardalyzer-master $HOME/mongo-shardalyzer-master/
+RUN chmod -R ugo+rw $HOME/mongo-shardalyzer-master
 #
 # Can we initialise the workspace?
 COPY jupyterlab-workspace.json $HOME/jupyterlab-workspace.json
@@ -36,6 +38,8 @@ COPY *.ipynb $HOME/
 USER root
 RUN chown -R jovyan $HOME/.jupyter
 USER jovyan
+WORKDIR $HOME/mongo-shardalyzer-master
+RUN npm install && ./node_modules/bower/bin/bower install
 WORKDIR $HOME/
 # https://github.com/dwmkerr/mongo-monitor
 USER root

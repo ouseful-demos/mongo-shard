@@ -1,0 +1,537 @@
+<!doctype html>
+<html ng-app="shardalyzer-ui">
+	<head>
+		<title>Shardalyzer</title>
+		<script src="/bower_components/jquery/dist/jquery.min.js"></script>
+		<script src="/bower_components/angular/angular.min.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/bootstrap/dist/css/bootstrap.min.css">
+		<link rel="stylesheet" href="/bower_components/angular-bootstrap/ui-bootstrap-csp.css">
+		<script src="/bower_components/angular-bootstrap/ui-bootstrap.min.js"></script>
+		<script src="/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/seiyria-bootstrap-slider/dist/css/bootstrap-slider.css">
+		<script src="/bower_components/seiyria-bootstrap-slider/dist/bootstrap-slider.js"></script>
+
+		<!--<link rel="stylesheet" href="/bower_components/angular-chart.js/dist/angular-chart.css">-->
+		<!--<script src="/bower_components/angular-chart.js/dist/angular-chart.js"></script>-->
+
+		<link rel="stylesheet" href="/bower_components/json-formatter/dist/json-formatter.min.css">
+		<script src="/bower_components/json-formatter/dist/json-formatter.min.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/jasny-bootstrap/dist/css/jasny-bootstrap.min.css" media="screen">
+		<script src="/bower_components/jasny-bootstrap/dist/js/jasny-bootstrap.min.js"></script>
+		<script src="/bower_components/jasny-bootstrap/js/offcanvas.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/angular-growl-v2/build/angular-growl.min.css">
+		<script src="/bower_components/angular-growl-v2/build/angular-growl.min.js"></script>
+
+		<script src="/bower_components/angular-animate/angular-animate.min.js"></script>
+
+		<script src="/bower_components/hammerjs/hammer.js"></script>
+		<script src="/bower_components/hamsterjs/hamster.js"></script>
+		<script src="/bower_components/angular-mousewheel/mousewheel.js"></script>
+
+		<script src="/bower_components/jquery-ui/ui/minified/core.min.js"></script>
+		<script src="/bower_components/jquery-ui/ui/minified/widget.min.js"></script>
+		<script src="/bower_components/jquery-ui/ui/minified/mouse.min.js"></script>
+		<script src="/bower_components/jquery-ui/ui/minified/sortable.min.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css">
+		<script src="/bower_components/bootstrap-switch/dist/js/bootstrap-switch.min.js"></script>
+		<script src="/bower_components/angular-bootstrap-switch/dist/angular-bootstrap-switch.min.js"></script>
+
+		<link rel="stylesheet" href="/bower_components/angular-ui-select/dist/select.min.css">
+		<script src="/bower_components/angular-ui-select/dist/select.min.js"></script>
+
+		<script src="/bower_components/angular-bootstrap-checkbox/angular-bootstrap-checkbox.js"></script>
+		<script src="/bower_components/angular-file-model/angular-file-model.js"></script>
+
+		<script src="/bower_components/angular-ui-sortable/sortable.min.js"></script>
+
+		<script src="/bower_components/chart.js/dist/Chart.js"></script>
+		<script src="/bower_components/chart.zoom.js/chartjs-plugin-zoom.js"></script>
+
+		<script src="/node_modules/relaxed-json/relaxed-json.js"></script>
+
+		<link rel="stylesheet" href="stylesheets/chart-tooltip.css">
+		<link rel="stylesheet" href="stylesheets/navmenu-push.css">
+		<link rel="stylesheet" href="stylesheets/spinner.css">
+		<link rel="stylesheet" href="stylesheets/style.css">
+
+		<script src="js/lib/util.js"></script>
+
+		<script src="js/lib/angular-bootstrap-slider-fork.js"></script>
+
+		<script src="js/lib/angular-chart-fork.js"></script>
+		<script src="js/lib/chart-tooltip.js"></script>
+
+		<script src="js/shardalyzer-ctrl.js"></script>
+		<script src="js/shardalyzer.js"></script>
+	</head>
+
+	<div id="mongowaiting" ng-if="(mongo.selectedNS == null || mongo.shardalyzer.position == null)" class="fadein fadeout" style="position: absolute; width:100vw; height:100vh; z-index: 999; background-color:white;">
+
+		<div id="mongoloading"
+			style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+
+			<div id="mongospinner" class="mongoloader" ng-show="(mongo.selectedNS !== null && mongo.shardalyzer.position == null)"
+				style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+				<div class="loaderBall" id="loaderBall_1">
+					<div class="innerBall"></div>
+				</div>
+				<div class="loaderBall" id="loaderBall_2">
+					<div class="innerBall"></div>
+				</div>
+				<div class="loaderBall" id="loaderBall_3">
+					<div class="innerBall"></div>
+				</div>
+				<div class="loaderBall" id="loaderBall_4">
+					<div class="innerBall"></div>
+				</div>
+				<div class="loaderBall" id="loaderBall_5">
+					<div class="innerBall"></div>
+				</div>
+			</div>
+
+			<img src="images/mongo-small.png" style="margin: auto; display: block; padding: 0 0 15px 0">
+
+			<div class="mongoprogress">
+				<div class="progress-bar progress-bar-success progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width:100%; padding:5px 10px 5px 10px">
+					<strong>
+						{{mongo.selectedNS == null ? 'WAITING FOR DATA...' : 'LOADING DATA...'}}
+					</strong>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<body ng-cloak>
+		<div growl limit-messages="5"></div>
+
+		<div id="navcontainer" class="container">
+			<div class="navbar navbar-default navbar-fixed-top" style="width:100%;">
+				<button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target="#navmenu" data-canvas="#navcontainer" data-placement="left">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<span class="navbar-brand" href="#"></span>
+			</div>
+
+			<nav id="navmenu" class="navmenu navmenu-default navmenu-fixed-left offcanvas" ng-controller="serverNsCtrl" role="navigation">
+				<span class="navmenu-brand" style="padding-top:15px"><strong>Connect to Server</strong></span>
+				<ul class="nav navmenu-nav">
+					<li class="active"><a href="#"><small>1. Specify server location</small></a></li>
+					<li><a href="#">Host
+							<input type="text" class="form-control" style="color: #333; font-weight:normal"
+								ng-model="mongo.host" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+						</a>
+					</li>
+					<li><a href="#">Port
+							<input type="number" class="form-control" style="color: #333; font-weight:normal" min="0" max="65535"
+								ng-model="mongo.port" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+						</a>
+					</li>
+					<li class="active"><a href="#"><small>2. Choose a namespace to visualise</small></a></li>
+					<li class="form-control" style="background:transparent; border:none">
+						<ui-select ng-model="mongo.selectedNS">
+							<ui-select-match placeholder="[namespace]">
+								{{$select.selected}}
+							</ui-select-match>
+							<ui-select-choices repeat="ns in mongo.nsList | filter: $select.search">
+								<span ng-bind="ns"></span>
+							</ui-select-choices>
+						</ui-select>
+					</li>
+				</ul>
+
+				<div style="position:absolute; bottom:0px; width:100%; background-color:#69a340">
+					<span class="navmenu-brand" style="padding-top:15px" ng-click="opts.advanced = !opts.advanced">
+						<span>
+							<strong>Advanced Options</strong>
+							<span class="glyphicon glyphicon-chevron-{{opts.advanced ? 'down' : 'up'}}" aria-hidden="true" style="float:right"></span>
+						</span>
+					</span>
+					<ul class="nav navmenu-nav" ng-show="opts.advanced">
+						<li class="active"><a href="#"><small>Specify custom config database name</small></a></li>
+						<li><a href="#">Config DB Name
+								<input type="text" class="form-control" style="color: #333; font-weight:normal"
+									ng-model="mongo.configdb" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+							</a>
+						</li>
+					</ul>
+					<ul class="nav navmenu-nav" ng-show="opts.advanced">
+						<li class="active"><a href="#"><small>Authentication settings</small></a></li>
+						<li><a href="#">Authentication Method
+								<ui-select ng-model="mongo.auth.config.authmech">
+									<ui-select-match placeholder="No Authentication">
+										{{$select.selected.key}}
+									</ui-select-match>
+									<ui-select-choices repeat="method.value as (key, method) in mongo.auth.methods | filter: {'key':$select.search}">
+										<span ng-bind="method.key"></span>
+									</ui-select-choices>
+								</ui-select>
+							</a>
+						</li>
+						<li ng-show="mongo.auth.config.authmech">
+							<a href="#">Credentials
+								<input type="text" class="form-control" style="color: #333; font-weight:normal" placeholder="{{mongo.auth.config.authmech == 'GSSAPI' ? '[principal]' : '[username]'}}"
+									ng-model="mongo.auth.config.username" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+								<input type="text" class="form-control" style="color: #333; font-weight:normal" placeholder="[password]" ng-show="mongo.auth.config.authmech != 'MONGODB-X509'"
+									ng-model="mongo.auth.config.password" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+							</a>
+						</li>
+						<li ng-show="mongo.auth.config.authmech && mongo.auth.config.authmech != 'MONGODB-X509'">
+							<a href="#">{{mongo.auth.config.authmech == "PLAIN" ? "LDAP Server" : mongo.auth.config.authmech == "GSSAPI" ? "Kerberos Server" : "Authentication Database"}}
+								<input type="text" class="form-control" style="color: #333; font-weight:normal"
+									ng-model="mongo.auth.config.authsrc" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+							</a>
+						</li>
+					</ul>
+					<ul class="nav navmenu-nav" ng-show="opts.advanced">
+						<li class="active"><a href="#"><small>SSL Configuration</small></a></li>
+						<li><a href="#">PEM File & Password
+								<div class="input-group">
+									<span class="input-group-btn">
+										<button type="button" class=" btn btn-default btn-file" value="...">
+											<span class="glyphicon glyphicon-file" aria-hidden="true"></span>
+											<input type="file" file-model="mongo.auth.config.pem">
+										</button>
+									</span>
+									<input type="text" class="form-control" style="color: #333; font-weight:normal" placeholder="SSL Disabled" ng-readonly="true"
+										ng-model="mongo.auth.config.pem.name" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+									<span class="input-group-btn">
+										<button type="button" class=" btn btn-default" ng-click="mongo.auth.config.pem=null" value="...">
+											<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+										</button>
+									</span>
+								</div>
+								<input type="text" class="form-control" style="color: #333; font-weight:normal" placeholder="[password]"
+									ng-model="mongo.auth.config.pempwd" ng-model-options="{updateOn : 'default'}" ng-enter="updateNSList()" />
+							</a>
+						</li>
+					</ul>
+				</div>
+			</nav>
+
+			<div id="contentcontainer" class="flexv">
+
+				<div id="header" class="snug" style="padding:120px 0 0 0;"></div>
+
+				<div id="shardview" class="greedy" style="height:0px; overflow:auto" ng-controller="updateCharts" msd-wheel="scaleCharts($event, $delta, $deltaX, $deltaY)">
+					<div id="clustersettings" style="position:absolute; z-index:2">
+						<div id="clusterinfo">
+							<button uib-tooltip-template="'clusterinfo.html'" tooltip-placement="right-top" tooltip-trigger="outsideClick" tooltip-append-to-body="false" type="button" class="btn btn-primary" style="margin:2px; float:left">
+								<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							</button>
+							<script type="text/ng-template" id="clusterinfo.html">
+								<div style="max-height:50vh">
+									<pre style="font-size:10px">
+										{{clusterinfo()}}
+									</pre>
+								</div>
+							</script>
+						</div>
+						<div id="lockinfo">
+							<button uib-tooltip-template="'lockinfo.html'" tooltip-placement="right-top" tooltip-trigger="outsideClick" tooltip-append-to-body="false" type="button" class="btn btn-primary" style="margin:2px; float:left">
+								<span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+							</button>
+							<script type="text/ng-template" id="lockinfo.html">
+								<div style="max-height:50vh">
+									<pre style="font-size:10px">
+										{{lockinfo()}}
+									</pre>
+								</div>
+							</script>
+						</div>
+						<div id="shardedit">
+							<span id="shardeditbuttons" style="display:inline-block; float:left">
+								<div class="btn-group-vertical" style="padding:2px">
+									<button type="button" class="{{chartmeta.shardedit ? 'btn btn-primary' : 'btn btn-default'}}" ng-click="chartmeta.shardedit = (!chartmeta.shardedit)" value="Edit">
+										<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+									</button>
+								</div>
+								<br />
+								<div class="btn-group-vertical" style="padding:2px">
+									<button type="button" class="btn btn-success" ng-show="chartmeta.shardedit" ng-click="chartmeta.enableall(true);" value="All">
+										<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+									</button>
+									<button type="button" class="btn btn-danger" ng-show="chartmeta.shardedit" ng-click="chartmeta.enableall(false);" value="None">
+										<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+									</button>
+								</div>
+								<br />
+								<div class="btn-group-vertical" style="padding:2px">
+									<button type="button" class="btn btn-{{chartmeta.heatmap.level[chartmeta.heatmap.thermostat]}}" ng-show="chartmeta.shardedit" ng-click="chartmeta.heatmap.thermostat = (chartmeta.heatmap.thermostat+1)%3" value="Heat">
+										<span class="glyphicon glyphicon-fire" aria-hidden="true"></span>
+									</button>
+								</div>
+								<br />
+								<div class="btn-group-vertical" style="padding:2px">
+									<button type="button" class="btn btn-default" ng-show="chartmeta.shardedit" ng-click="scaleCharts(null, 1)" value="+">
+										<span class="glyphicon glyphicon-zoom-in" aria-hidden="true"></span>
+									</button>
+									<button type="button" class="btn btn-default" ng-show="chartmeta.shardedit" ng-click="scaleCharts(null, -1)" value="-">
+										<span class="glyphicon glyphicon-zoom-out" aria-hidden="true"></span>
+									</button>
+								</div>
+							</span>
+							<span id="shardgranularity" style="display:inline-block; float:left; padding-top:5px; padding-left:5px">
+								<slider ng-model="chartmeta.granularity.value" ng-show="chartmeta.shardedit"
+									formatter="chartmeta.granularity.format(value)"
+									min="chartmeta.granularity.min"
+									max="chartmeta.granularity.max"
+									orientation="vertical"
+									scale="'logarithmic'"
+									reversed="true">
+								</slider>
+							</span>
+						</div>
+					</div>
+					<div id="shardsorter" ui-sortable="chartmeta.sortopts" ng-model="chartmeta.shardlist" ng-readonly="true" class="row-centered" style="overflow-x:hidden">
+						<div ng-repeat="shard in chartmeta.shardlist" ng-if="mongo.ui.shardenabled[shard] || chartmeta.shardedit"
+							class="{{chartmeta.colclasses[chartmeta.currentcol]}} col-centered" style="opacity:{{mongo.ui.shardenabled[shard] ? 1 : 0.25}}">
+							<canvas id="doughnut_{{shard}}" class="chart chart-doughnut" ng-readonly="true"
+								chart-options="chartmeta.options[shard]"
+								chart-data="chartmeta.data[shard]"
+								chart-labels="chartmeta.labels[shard]"
+								chart-colors="chartmeta.colors[shard]"
+								chart-highlights="chartmeta.highlights[shard]"
+								chart-watch="{'chartColors[0]':{type:'collection'},'chartData[1]':{type:'collection'},'chartData':{reset:true}}"
+								chart-hover="chunkHover"
+								chart-click="chunkClick"></canvas>
+							<p align="center">
+								<a href="#" uib-tooltip-template="'shardinfo.html'" tooltip-trigger="outsideClick" tooltip-placement="auto bottom" tooltip-append-to-body="true" style="color:{{mongo.shardalyzer.balancer[shard]}};">
+									<b>{{shard}} : {{mongo.shardalyzer.shards[shard].length}}</b>
+								</a>
+							</p>
+							<script type="text/ng-template" id="shardinfo.html">
+								<div style="max-height:30vh">
+									<pre style="font-size:10px">
+										{{shardinfo(shard)}}
+									</pre>
+								</div>
+							</script>
+							<div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-100%);" ng-show="chartmeta.shardedit">
+								<input type="checkbox" bs-switch ng-model="mongo.ui.shardenabled[shard]">
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="chartjs-tooltip-shardalyzer" class="chartjs-tooltip" style="visibility:hidden; z-index:100"></div>
+
+				<div id="shardcontrols" class="snug" style="margin: 15px 0 10px 0">
+					<div class="flexh" style="width:75%; margin:0 auto;">
+						<div class="snug" style="padding-right:15px" ng-controller="playControl">
+							<div class="btn-group" role="group">
+								<button type="button" class="btn btn-primary" ng-click="playctrl.start();" value="|<">
+									<span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-info" ng-click="playctrl.rewind();" value="<<">
+									<span class="glyphicon glyphicon-backward" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-danger" ng-click="playctrl.backError();" value="! <">
+									<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-default" ng-click="playctrl.back();" value="<">
+									<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-default" ng-click="playctrl.forward();" value=">">
+									<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-danger" ng-click="playctrl.forwardError();" value="> !">
+									<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-info" ng-click="playctrl.fastforward();" value=">>">
+									<span class="glyphicon glyphicon-forward" aria-hidden="true"></span>
+								</button>
+								<button type="button" class="btn btn-primary" ng-click="playctrl.end();" value=">|">
+									<span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+								</button>
+							</div>
+
+							<button uib-popover-template="'chunklegend.html'" popover-title="Chunk Legend" popover-append-to-body="true" type="button" class="btn btn-default">
+								<span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+							</button>
+
+							<script type="text/ng-template" id="chunklegend.html">
+								<div ng-repeat="(status, color) in mongo.shardalyzer.statuscolors" ng-if="status !== 'undefined'" ng-readonly="true"
+									style="color:{{color}};"><strong>{{status}}</strong></div>
+							</script>
+
+							<button uib-popover-template="'watchchunks.html'" popover-title="Watch Chunks" popover-append-to-body="true" type="button" class="btn btn-default">
+								<span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+							</button>
+
+							<script type="text/ng-template" id="watchchunks.html">
+								<a href="#" class="list-group-item" ng-repeat="(shardkey, color) in mongo.shardalyzer.watched" ng-if="shardkey !== 'undefined'" ng-readonly="true" style="color:{{color}}; width:100%">
+									<strong>{{shardkey}}</strong>
+									<div class="btn-group" role="group" style="margin-left:10px">
+										<button type="button" class="btn btn-default" ng-click="watchbox.prev(shardkey)" value="<" style="vertical-align:middle; display:inline-block; white-space:inherit!important">
+											<span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+										</button>
+										<button type="button" class="btn btn-default" ng-click="watchbox.next(shardkey)" value=">" style="vertical-align:middle; display:inline-block; white-space:inherit!important">
+											<span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+										</button>
+										<button type="button" class="btn btn-danger" ng-click="watchbox.unwatchChunk(shardkey)" value="x" style="vertical-align:middle; display:inline-block; white-space:inherit!important">
+											<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+										</button>
+									</div>
+								</a>
+								<input type="text" placeholder="Min shardkey of chunk" ng-model="watchbox.watch" ng-enter="watchbox.watchChunk(watchbox.watch)" class="form-control">
+							</script>
+
+							<button uib-popover-template="'searchwidget.html'" popover-title="Search by Timestamp" popover-append-to-body="true" type="button" class="btn btn-default">
+								<span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+							</button>
+
+							<script type="text/ng-template" id="searchwidget.html">
+								<input type="text" ng-model="searchbar.search" typeahead="change as change.time for change in mongo.shardalyzer.changes | filter:$viewValue | limitTo:10" class="form-control">
+							</script>
+
+						</div>
+
+						<div class="greedy" ng-controller="sliderControl">
+							<slider ng-model="mongo.ui.slider"
+								reversed="{{mongo.shardalyzer.changes.length > 0}}"
+								min="slidermeta.min"
+								max="slidermeta.max"
+								scale="slidermeta.scale"
+								range_highlights="slidermeta.ranges"
+								formatter="slidermeta.formatter(value)">
+							</slider>
+							<span id="erroroptions" class="form-inline form-group" style="width:100%">
+								<button type="button" style="margin:5px; float:left" class="{{mongo.ui.showmigrations ? 'btn btn-primary' : 'btn btn-default'}}" ng-click="mongo.ui.showmigrations = (!mongo.ui.showmigrations)" value="Edit">
+									<span class="glyphicon glyphicon-stats" aria-hidden="true"></span>
+								</button>
+								<button uib-popover-template="'errorsummary.html'" popover-title="Migration Summary" popover-append-to-body="true" type="button" class="btn btn-default" style="margin:5px; float:left">
+									<span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span>
+								</button>
+								<script type="text/ng-template" id="errorsummary.html">
+									<json-formatter id="errorsummaryjson"
+										class="form-control" style="height:320px; overflow-y:scroll; background:white"
+										json="mongo.ui.errorsummary"
+										open="10" ng-readonly="true">
+									</json-formatter>
+								</script>
+
+								<label ng-repeat="(name, opts) in errorconfig.opts" class="form-control" style="margin:5px; float:left; background-color:transparent; border:none; box-shadow:none">
+									<checkbox ng-model="opts.enabled" class="btn-{{opts.severity}}"></checkbox>
+									{{opts.name}}
+								</label>
+								<label ng-repeat="(name, param) in errorconfig.params" style="margin:5px; float:right">
+									{{param.name || ''}}
+									<input ng-if="param.type !== 'select'" type="{{param.type}}" ng-model="param.value" id="param.name" min=1 class="form-control">
+									<select ng-if="param.type == 'select'" ng-model="param.value" ng-options="opt as key for (key, opt) in param.options" id="param.name" class="form-control" style="color: #333; font-weight:normal"></select>
+								</label>
+							</span>
+						</div>
+					</div>
+				</div>
+
+				<div style="margin: 0 auto; margin-bottom:10px; width: 75%; height:200px;" ng-controller="migrateCtrl" ng-show="mongo.ui.showmigrations">
+					<div class="panel panel-default panel-body" style="float: left; width:25%; height:100%">
+						<canvas id="migrateBars" class="chart chart-bar" ng-readonly="true" chart-data="chartmeta.bars.data" chart-labels="chartmeta.bars.labels" chart-colors="chartmeta.bars.colors"
+							chart-series="chartmeta.bars.series" chart-options="chartmeta.bars.options" chart-watch="{'chartData':{reset:true}}" chart-click="migrateBarClick">
+						</canvas>
+					</div>
+					<div class="panel panel-default panel-body" style="float: right; width:75%; height:100%">
+						<div style="width:100%; height:100%">
+							<canvas id="migrateGraph" class="chart chart-scatter" ng-readonly="true" chart-data="chartmeta.graph.data" chart-labels="chartmeta.graph.labels" chart-colors="chartmeta.graph.colors"
+								chart-series="chartmeta.graph.series" chart-options="chartmeta.graph.options" chart-watch="{'chartOptions.flagRefresh':{}}" chart-click="migrateClick" chart-hover="migrateHover">
+							</canvas>
+						</div>
+						<div style="float:right; transform: translate(0, -50%);">
+							<button type="button" class="btn btn-xs {{chartmeta.graph.yAxes.mig_time.stacked ? 'btn-success' : 'btn-danger'}}" ng-model="chartmeta.graph.yAxes.mig_time.stacked" uib-btn-checkbox>
+								<span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+							</button>
+							<select style="color: #333; font-weight:normal"
+								ng-options="shardname as shardname for (shardname, shard) in mongo.shardalyzer.shards"
+								ng-model="chartmeta.graph.from">
+								<option value="">All shards</option>
+							</select>
+							-
+							<select style="color: #333; font-weight:normal"
+								ng-options="shardname as shardname for (shardname, shard) in mongo.shardalyzer.shards"
+								ng-model="chartmeta.graph.to">
+								<option value="">All shards</option>
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div style="width:75%; margin:0 auto; margin-bottom:-5px" ng-style="{ 'visibility' : (mongo.ui.errmsg[mongo.ui.slider] != undefined ? 'visible' : 'hidden') }">
+					<uib-alert type="{{mongo.ui.errmsg[mongo.ui.slider].type}}">{{mongo.ui.errmsg[mongo.ui.slider].msg}}&nbsp;</uib-alert>
+				</div>
+
+				<div id="changelogquery" class="snug" style="width:75%; margin:0 auto">
+					<uib-tabset>
+						<uib-tab heading="Changelog">
+							<div class="form form-inline" ng-show="mongo.ui.showchangelog" style="width:100%; height:24em; max-height:24em;">
+								<select id="changelist" class="form-control" style="width:75%; height:100%; overflow-x:scroll; overflow-y:hidden; float:left"
+									ng-options="index as change | json for (index, change) in mongo.ui.changelog"
+									ng-model="mongo.ui.selectedchange"
+									ng-controller="changelogControl"
+									ng-readonly="true"
+									size=18>
+								</select>
+
+								<div style="width:25%; height:100%; overflow-x:scroll; overflow-y:scroll; background:white; float:right;">
+									<json-formatter id="changejson"
+										class="form-control" style="width:100%; height:100%; background:white; border:none; box-shadow:none"
+										ng-show="mongo.ui.changelog[mongo.ui.selectedchange] !== undefined"
+										json="mongo.ui.changelog[mongo.ui.selectedchange]"
+										open="3" ng-readonly="true">
+									</json-formatter>
+								</div>
+							</div>
+						</uib-tab>
+						<uib-tab heading="Query">
+							<div class="flexv" ng-controller="queryCtrl" ng-show="mongo.ui.showchangelog" style="width:100%; height:24em; max-height:24em;">
+								<div class="input-group snug">
+									<span class="input-group-btn">
+										<select class="form-control"
+											ng-model="query.selectedColl"
+											ng-init="query.selectedColl = 'changelog'"
+											ng-options="coll.name as coll.name for coll in mongo.collList">
+											<option value="">[collection]</option>
+										</select>
+									</span>
+
+									<input type="text" class="form-control" ng-model="query.query" ng-model-options="{updateOn : 'default'}" ng-enter="query.submit()" />
+
+									<span class="input-group-btn">
+										<select class="form-control"
+											ng-model="query.andreAgg"
+											ng-options="value as key for (key, value) in query.andre_aggregrassi">
+											<option value="">[Predefined Aggregations]</option>
+										</select>
+									</span>
+
+									<span class="input-group-btn">
+										<button type="button" class="btn btn-primary" ng-click="query.submit()" value="?">
+											<span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+										</button>
+									</span>
+								</div>
+
+								<textarea class="form-control greedy" style="width:100%;" ng-model="query.result" ng-readonly="true"></textarea>
+							</div>
+						</uib-tab>
+						<button type="button" class="btn btn-default pull-right" ng-click="mongo.ui.showchangelog = (!mongo.ui.showchangelog)" value="Show/Hide">
+							<span class="glyphicon {{mongo.ui.showchangelog ? 'glyphicon-menu-down' : 'glyphicon-menu-up'}}" aria-hidden="true"></span>
+						</button>
+					</uib-tabset>
+				</div>
+
+				<div class="footer" style="margin: 15px 0 0 -15px"></div>
+
+			</div>
+
+		</div>
+
+	</body>
+
+</html>
