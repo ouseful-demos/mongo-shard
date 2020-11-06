@@ -1,0 +1,60 @@
+#https://stackoverflow.com/a/38885656/454773
+
+version: "3"
+services:
+  mongo1:
+    hostname: mongo1
+    container_name: mongo1
+    image: mongo:4.0.4
+    volumes:
+      - ./data1/db:/data/db
+      - ./data1/configdb:/data/configdb
+    networks:
+      - mongo-dev-net
+        - ipv4_address: 172.16.0.1
+    expose:
+      - 27017
+    ports:
+      - 30001:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip", "127.0.0.1,172.16.0.1", "--replSet", "devrs" ]
+  mongo2:
+    hostname: mongo2
+    container_name: mongo2
+    image: mongo:4.0.4
+    volumes:
+      - ./data2/db:/data/db
+      - ./data2/configdb:/data/configdb
+    networks:
+      - mongo-dev-net
+        - ipv4_address: 172.16.0.2
+    expose:
+      - 27017
+    ports:
+      - 30002:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod",  "--bind_ip", "127.0.0.1,172.16.0.1", "--replSet", "devrs" ]
+  mongo3:
+    hostname: mongo3
+    container_name: mongo3
+    image: mongo:4.0.4
+    volumes:
+      - ./data3/db:/data/db
+      - ./data3/configdb:/data/configdb
+    networks:
+      - mongo-dev-net
+        - ipv4_address: 172.16.0.3
+    expose:
+      - 27017
+    ports:
+      - 30003:27017
+    restart: always
+    entrypoint: [ "/usr/bin/mongod",  "--bind_ip", "127.0.0.1,172.16.0.1", "--replSet", "devrs" ]
+
+networks:
+  mongo_dev_net:
+    driver: bridge
+    ipam:
+      config:
+      - subnet: 172.16.0.0/24
+        gateway: 172.16.0.254
